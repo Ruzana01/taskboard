@@ -114,3 +114,16 @@ if [ ! -d "$VENV_DIR" ]; then
 else
     echo ">> Virtual environment already exists."
 fi
+
+# ------------------------------------------------------------
+# STEP 4: Install Python Libraries
+# ------------------------------------------------------------
+
+echo ""
+echo "=== Step 4/8: Installing Python Requirements ==="
+
+"$APP_DIR/$VENV_DIR/bin/python" -m pip install --upgrade pip
+"$APP_DIR/$VENV_DIR/bin/python" -m pip install uv
+"$APP_DIR/$VENV_DIR/bin/python" -m uv pip install -r requirements.txt
+
+echo ">> Python packages installed successfully."
