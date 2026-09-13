@@ -218,3 +218,42 @@ echo "$UVICORN_PID" > "$PID_FILE"
 echo ">> Uvicorn process spawned."
 echo "   - PID:  $UVICORN_PID"
 echo "   - Logs: $LOG_FILE"
+
+# ------------------------------------------------------------
+# STEP 8: Application Health Verification
+# ------------------------------------------------------------
+
+echo ""
+echo "=== Step 8/8: Verifying System Health ==="
+
+HEALTH_URL="http://localhost:$APP_PORT/api/health"
+
+echo ">> Waiting 3 seconds for server initialization..."
+sleep 3
+
+if curl -s -f "$HEALTH_URL" > /dev/null; then
+    echo ""
+    echo "**************************************************"
+    echo "   DEPLOYMENT COMPLETED SUCCESSFULLY!"
+    echo "**************************************************"
+    echo ""
+    echo " Web UI:     http://localhost:$APP_PORT/"
+    echo " API Docs:   http://localhost:$APP_PORT/docs"
+    echo " Health:     $HEALTH_URL"
+    echo ""
+    echo " Process ID: $UVICORN_PID"
+    echo " Log file:   $LOG_FILE"
+else
+    echo ""
+    echo "**************************************************"
+    echo " [FAILURE] TASKBOARD FAILD TO RESPOND!"
+    echo "**************************************************"
+    echo ""
+    echo "Recent output log ($LOG_FILE):"
+    echo "--------------------------------------------------"
+
+    cat "$LOG_FILE"
+
+    echo "--------------------------------------------------"
+    exit 1
+fi
