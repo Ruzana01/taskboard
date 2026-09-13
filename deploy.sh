@@ -100,3 +100,17 @@ if [ ! -f "requirements.txt" ]; then
 fi
 
 echo ">> Working Directory: $APP_DIR"
+
+# ------------------------------------------------------------
+# STEP 3: Setup Virtual Environment
+# ------------------------------------------------------------
+
+echo ""
+echo "=== Step 3/8: Setting up Python Virtual Environment ==="
+
+if [ ! -d "$VENV_DIR" ]; then
+    echo ">> Building virtual environment in '$VENV_DIR'..."
+    python3 -m venv "$VENV_DIR"
+else
+    echo ">> Virtual environment already exists."
+fi
