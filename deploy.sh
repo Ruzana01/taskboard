@@ -182,3 +182,39 @@ else
 fi
 
 echo ">> Database setup finalized."
+
+# ------------------------------------------------------------
+# STEP 7: Launch Server Process via Uvicorn
+# ------------------------------------------------------------
+
+echo ""
+echo "=== Step 7/8: Starting Backend Server ==="
+
+# Kill existing instance if PID file exists
+if [ -f "$PID_FILE" ]; then
+    OLD_PID="$(cat "$PID_FILE")"
+
+    if kill -0 "$OLD_PID" >/dev/null 2>&1; then
+        echo ">> Terminating running instance (PID $OLD_PID)..."
+        kill "$OLD_PID"
+        sleep 1
+    fi
+
+    rm -f "$PID_FILE"
+fi
+
+echo ">> Launching Uvicorn server in background..."
+
+nohup "$APP_DIR/$VENV_DIR/bin/uvicorn" \
+    app.main:app \
+    --host "$APP_HOST" \
+    --port "$APP_PORT" \
+    > "$LOG_FILE" 2>&1 &
+
+UVICORN_PID=$!
+
+echo "$UVICORN_PID" > "$PID_FILE"
+
+echo ">> Uvicorn process spawned."
+echo "   - PID:  $UVICORN_PID"
+echo "   - Logs: $LOG_FILE"
