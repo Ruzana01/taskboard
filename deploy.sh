@@ -150,3 +150,35 @@ if ! sudo -u postgres pg_isready >/dev/null 2>&1; then
 fi
 
 echo ">> PostgreSQL service is responsive."
+
+# ------------------------------------------------------------
+# STEP 6: Configure DB User & Target Schema
+# ------------------------------------------------------------
+
+echo ""
+echo "=== Step 6/8: Setting up PostgreSQL Credentials & DB ==="
+
+# Check if database user exists
+if sudo -u postgres psql -tAc \
+    "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" | grep -q 1; then
+
+    echo ">> Role '$DB_USER' already configured."
+else
+    echo ">> Creating new DB user '$DB_USER'..."
+
+    sudo -u postgres psql -v ON_ERROR_STOP=1 -c \
+        "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
+fi
+
+# Check if target database exists
+if sudo -u postgres psql -tAc \
+    "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1; then
+
+    echo ">> Database '$DB_NAME' already present."
+else
+    echo ">> Initializing new database '$DB_NAME'..."
+
+    sudo -u postgres createdb -O "$DB_USER" "$DB_NAME"
+fi
+
+echo ">> Database setup finalized."
