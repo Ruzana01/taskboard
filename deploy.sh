@@ -127,3 +127,26 @@ echo "=== Step 4/8: Installing Python Requirements ==="
 "$APP_DIR/$VENV_DIR/bin/python" -m uv pip install -r requirements.txt
 
 echo ">> Python packages installed successfully."
+
+
+# ------------------------------------------------------------
+# STEP 5: Verify PostgreSQL Service Status
+# ------------------------------------------------------------
+
+echo ""
+echo "=== Step 5/8: Validating Database Service ==="
+
+if ! sudo systemctl is-active --quiet postgresql; then
+    echo ">> PostgreSQL daemon is offline. Launching service..."
+    sudo systemctl start postgresql
+else
+    echo ">> PostgreSQL service is active."
+fi
+
+# Ensure PostgreSQL accepts incoming requests
+if ! sudo -u postgres pg_isready >/dev/null 2>&1; then
+    echo "[CRITICAL ERROR] PostgreSQL service is not accepting connections!"
+    exit 1
+fi
+
+echo ">> PostgreSQL service is responsive."
